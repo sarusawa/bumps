@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('encoding.js').getContent(); ?>
+    <script type='text/javascript'>
+      window.onload = function() {
+        handleDownload();
+      }
+      function handleDownload() {
+        // 出力データを取得する
+        var content = <?= getCsvData(); ?>;
+        // Shift_JISに変換
+        var utf8Array  = Encoding.stringToCode(content);
+        var sjisArray = Encoding.convert(utf8Array, "SJIS", "UNICODE");
+        var uint8Array = new Uint8Array(sjisArray);
+        var blob = new Blob([uint8Array], {type: "text/csv;"});
+        var link = document.createElement('a');
+        // ファイル名を取得する
+        link.download = <?= getCsvFileName(); ?>;
+        link.href = window.URL.createObjectURL(blob);
+        link.click();
+        // ダイアログを閉じる
+        google.script.host.close();
+      }
+    </script>
+  </head>
+</html>
